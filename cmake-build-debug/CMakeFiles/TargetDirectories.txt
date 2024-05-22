@@ -1,3 +1,0 @@
-C:/Users/alici/S8_Cpp/file_compression_cpp/cmake-build-debug/CMakeFiles/file_compression_cpp.dir
-C:/Users/alici/S8_Cpp/file_compression_cpp/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/alici/S8_Cpp/file_compression_cpp/cmake-build-debug/CMakeFiles/rebuild_cache.dir
