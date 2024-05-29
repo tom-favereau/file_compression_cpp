@@ -5,4 +5,8 @@
 #include "JPEG.h"
 
 namespace jpeg {
+    JPEG::JPEG(std::string file_name) : file_name(file_name), {
+
+    }
+
 } // jpeg
