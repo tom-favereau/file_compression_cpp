@@ -7,7 +7,8 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-
+#include "QuantisationTable.h"
+#include "Huffman.h"
 
 namespace jpeg {
 
@@ -35,13 +36,21 @@ namespace jpeg {
         uint8_t nb_comp; //couleur ou non
         std::vector<InfoComposante> arrayInfoComposante; //tableau de taille nb_com
 
+        //Define Quantization Tables
+        std::vector<quantisation_table::QuantisationTable> quantisationTables;
+
+        //Define Huffman Tables
+        std::vector<std::vector<huffman::Huffman>> huffmanTables; // 2D!!!!!!!!!!!!!!
+
         //start of scan
         std::vector<InfoBrut> arrayInfoBrut; //tableau de taille n;
-
+        static int nextSection(const int index, const std::vector<char>& imageBytes);
+        static int readBytes(const std::vector<char>& imageBytes, int index, int size);
 
     public:
-        JPEG(std::string file_name);
-
+        JPEG(const std::string& file_name);
+        static std::vector<char> getBytes(const std::string& filename);
+        static std::vector<std::vector<char>> getSectors(const std::vector<char>& imageBytes);
     };
 
 } // jpeg
