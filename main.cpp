@@ -11,4 +11,8 @@ int main() {
     }
     std::cout << "filestream size: " << filestream.size() << std::endl;
     std::cout << "sector size: " << sector_size << std::endl;
+
+    char c = '\010';
+    std::cout << "Read Byte: " << ByteReading::readByte(c, 2, 4) << std::endl;
+
 }

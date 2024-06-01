@@ -7,8 +7,11 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include "ByteReading.h"
 #include "QuantisationTable.h"
 #include "Huffman.h"
+#include <fstream>
+#include <iostream>
 
 namespace jpeg {
 
@@ -44,7 +47,6 @@ namespace jpeg {
 
         //start of scan
         std::vector<InfoBrut> arrayInfoBrut; //tableau de taille n;
-        static int readBytes(const std::vector<char>& imageBytes, int index, int size);
 
     public:
         JPEG(const std::string& file_name);
