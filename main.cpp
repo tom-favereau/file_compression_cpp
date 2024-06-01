@@ -1,13 +1,14 @@
 #include <iostream>
 #include "JPEG.h"
 int main() {
-    std::string filename = R"(C:\Users\alici\S8_Cpp\file_compression_cpp\francois.jpg)";
-    auto filestream = jpeg::JPEG::getBytes(filename);
-    for (char i: filestream)
-        std::cout << i << ' ';
 
+    std::string filename = R"(C:\Users\alici\S8_Cpp\file_compression_cpp\alexandria.jpeg)";
+    auto filestream = jpeg::JPEG::getBytes(filename);
     auto sectors = jpeg::JPEG::getSectors(filestream);
-    for (std::vector<char> i: sectors){
-        std::cout << "1" << ' ';
+    int sector_size = 0;
+    for (const auto& sector : sectors) {
+        sector_size += sector.size();
     }
+    std::cout << "filestream size: " << filestream.size() << std::endl;
+    std::cout << "sector size: " << sector_size << std::endl;
 }

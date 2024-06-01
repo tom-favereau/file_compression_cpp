@@ -44,7 +44,6 @@ namespace jpeg {
 
         //start of scan
         std::vector<InfoBrut> arrayInfoBrut; //tableau de taille n;
-        static int nextSection(const int index, const std::vector<char>& imageBytes);
         static int readBytes(const std::vector<char>& imageBytes, int index, int size);
 
     public:
