@@ -69,12 +69,11 @@ namespace jpeg {
                     width = ByteReading::readBytes(sector, 7, 2);
                     nb_comp = ByteReading::readBytes(sector, 9, 1);
                     for (int i = 0x0a; i < sector.size(); i += 3) {
-                        //SOF0
                         int ic = ByteReading::readBytes(sector, i, 1);
                         int ieh = ByteReading::readByte(sector[i + 1], 0, 4);
                         int iev = ByteReading::readByte(sector[i + 1], 4, 4);
                         int iq = ByteReading::readBytes(sector, i + 2, 1);
-                        arrayInfoComposante.push_back(InfoComposante(ic, ieh, iev, iq));
+                        arrayInfoComposante.push_back(InfoComposante{.ic =  ic, .fh = ieh, .fv = iev, .iq = iq});
                     }
                 } else if (marker == 0xffc4) {
                     //DHT

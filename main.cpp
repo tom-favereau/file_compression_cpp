@@ -2,7 +2,7 @@
 #include "JPEG.h"
 int main() {
 
-    std::string filename = R"(C:\Users\alici\S8_Cpp\file_compression_cpp\alexandria.jpeg)";
+    std::string filename = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/alexandria.jpeg)";
     auto filestream = jpeg::JPEG::getBytes(filename);
     auto sectors = jpeg::JPEG::getSectors(filestream);
     int sector_size = 0;

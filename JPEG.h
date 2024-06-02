@@ -16,10 +16,10 @@
 namespace jpeg {
 
     struct InfoComposante {
-        uint8_t ic; // indice de composante horizontal
-        uint8_t fh; // facteur d'échantillonage horizontal
-        uint8_t fv; // ___ vertical
-        uint8_t iq; // indice quantification
+        int ic; // indice de composante horizontal
+        int fh; // facteur d'échantillonage horizontal
+        int fv; // ___ vertical
+        int iq; // indice quantification
     };
 
     struct InfoBrut{
