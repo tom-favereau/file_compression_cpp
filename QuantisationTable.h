@@ -14,6 +14,7 @@ namespace quantisation_table {
         std::vector<char> values;
     public:
         explicit QuantisationTable(std::vector<char> sector);
+        static int access(int i, int j);
     };
 
 
