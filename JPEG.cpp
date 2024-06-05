@@ -59,6 +59,11 @@ namespace jpeg {
                 if (marker == 0xffe0) {
                     //APP0
                     //TODO Check if image is in JFIF
+                } else if (marker == 0xffdd) {
+                    //TODO DRI NOT YET SUPPORTED
+                    std::cerr << "DRI NOT YET SUPPORTED" << std::endl;
+                } else if (marker > 0xffe0 && marker <= 0xffef) {
+                    //TODO APPn exception not handled
                 } else if (marker == 0xffdb) {
                     //DQT
                     quantisationTables.push_back(quantisation_table::QuantisationTable(sector));
@@ -75,6 +80,8 @@ namespace jpeg {
                         int iq = ByteReading::readBytes(sector, i + 2, 1);
                         arrayInfoComposante.push_back(InfoComposante{.ic =  ic, .fh = ieh, .fv = iev, .iq = iq});
                     }
+                } else if ((marker > 0xffc0 && marker <= 0xffc3) || (marker >= 0xffc5 && marker <= 0xffc7) ) {
+                    //TODO Compression not handled
                 } else if (marker == 0xffc4) {
                     //DHT
                     Huffman huff = Huffman(sector);
