@@ -77,7 +77,12 @@ namespace jpeg {
                     }
                 } else if (marker == 0xffc4) {
                     //DHT
-                    //huffmanTables[0].push_back(Huffman(sector));
+                    Huffman huff = Huffman(sector);
+                    if (huff.isAC()){
+                        ACHuffmanTables.push_back(huff);
+                    } else {
+                        DCHuffmanTables.push_back(huff);
+                    }
                 } else if (marker == 0xffda) {
                     //SOS
                     int i = 0x05;

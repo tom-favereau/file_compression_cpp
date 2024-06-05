@@ -36,8 +36,8 @@
 
     public:
         Huffman(const std::vector<char>& sector);
-
         std::vector<uint8_t> readBlock(const uint8_t& previousDC, const std::vector<char>& sector);
+        bool isAC();
 
     };
 

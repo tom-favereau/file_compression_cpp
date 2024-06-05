@@ -12,7 +12,7 @@ Huffman::Huffman(const std::vector<char>& sector){
     bool bit1 = sector[4] & 0b00000010;  // Vérifie le bit 1
     bool bit2 = sector[4] & 0b00000100;  // Vérifie le bit 2
     bool bit3 = sector[4] & 0b00001000;  // Vérifie le bit 3
-    bool bit4 = sector[4] & 0b00010000;  // Vérifie le bit 3
+    bool bit4 = sector[4] & 0b00010000;  // Vérifie le bit 4
 
     if (bit0){
         indice_huffman = 0;
@@ -50,4 +50,8 @@ void Huffman::buildCode(const std::vector<char>& sector) {
 
 std::vector<uint8_t> Huffman::readBlock(const uint8_t& previousDC, const std::vector<char> &sector) {
     
+}
+
+bool Huffman::isAC() {
+    return type;
 }
