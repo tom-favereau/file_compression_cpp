@@ -4,7 +4,7 @@
 
 #include "BitReader.h"
 
-BitReader::BitReader(const std::vector<char>& sector) : sector(sector), currentByteIndex(-1), currentByte() , currentSectorIndex(-1){}
+BitReader::BitReader(const std::vector<char>& sector) : sector(sector), currentByteIndex(-1), currentByte(sector[0]) , currentSectorIndex(0){}
 
 bool BitReader::hasNextByte(){
     return currentSectorIndex < sector.size();

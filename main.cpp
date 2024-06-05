@@ -1,5 +1,7 @@
 #include <iostream>
 #include "JPEG.h"
+#include "BitReader.h"
+
 int main() {
 
     std::string filename_a = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/alexandria.jpeg)";
@@ -27,5 +29,10 @@ int main() {
         for (int j = 0; j < 8; j++){
             std::cout << i << " " << j << " : " << quantisation_table::QuantisationTable::access(i, j) << std::endl;
         }
+    }
+
+    BitReader br = BitReader(sectors[0]);
+    for (int i = 0; i < 32; i++){
+        std::cout << br.nextBit() << std:: endl;
     }
 }

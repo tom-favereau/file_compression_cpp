@@ -43,7 +43,7 @@ namespace jpeg {
         std::vector<quantisation_table::QuantisationTable> quantisationTables;
 
         //Define Huffman Tables
-        std::vector<std::vector<huffman::Huffman>> huffmanTables; // 2D!!!!!!!!!!!!!!
+        std::vector<std::vector<Huffman>> huffmanTables; // 2D!!!!!!!!!!!!!!
 
         //start of scan
         std::vector<InfoBrut> arrayInfoBrut; //tableau de taille n;
