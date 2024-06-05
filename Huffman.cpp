@@ -8,24 +8,8 @@
 
 
 Huffman::Huffman(const std::vector<char>& sector){
-    bool bit0 = sector[4] & 0b00000001;  // Vérifie le bit 0
-    bool bit1 = sector[4] & 0b00000010;  // Vérifie le bit 1
-    bool bit2 = sector[4] & 0b00000100;  // Vérifie le bit 2
-    bool bit3 = sector[4] & 0b00001000;  // Vérifie le bit 3
-    bool bit4 = sector[4] & 0b00010000;  // Vérifie le bit 4
-
-    if (bit0){
-        indice_huffman = 0;
-    } else if (bit1){
-        indice_huffman = 1;
-    } else if (bit2){
-        indice_huffman = 2;
-    } else if (bit3){
-        indice_huffman = 3;
-    }
-
-    type = bit4;
-
+    type = ByteReading::readByte(sector[4], 0, 4);
+    indice_huffman = ByteReading::readByte(sector[4], 4, 4);
     for (int i = 0; i < 16; i++){
         nb_symboles[i] = ByteReading::readBytes(sector, 0x05+i, 1);
     }
