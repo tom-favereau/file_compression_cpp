@@ -12,7 +12,6 @@ class ByteReading {
 
 public:
     static int readBytes(const std::vector<char>& imageBytes, int index, int size);
-
     static int readByte(char byte, int index, int size);
 };
 

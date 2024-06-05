@@ -52,7 +52,7 @@ namespace jpeg {
         std::vector<char> rawData;
 
     public:
-        JPEG(const std::string& file_name);
+        explicit JPEG(const std::string& file_name);
         static std::vector<char> getBytes(const std::string& filename);
         static std::vector<std::vector<char>> getSectors(const std::vector<char>& imageBytes);
     };
