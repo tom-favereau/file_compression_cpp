@@ -23,9 +23,9 @@ namespace jpeg {
     };
 
     struct InfoBrut{
-        uint8_t ic; //indice composante
-        uint8_t ihAC; //indice huffman
-        uint8_t ihDC; //indice huffman
+        int ic; //indice composante
+        int ihAC; //indice huffman
+        int ihDC; //indice huffman
     };
 
     class JPEG {
@@ -47,6 +47,9 @@ namespace jpeg {
 
         //start of scan
         std::vector<InfoBrut> arrayInfoBrut; //tableau de taille n;
+
+        //Raw Data
+        std::vector<char> rawData;
 
     public:
         JPEG(const std::string& file_name);

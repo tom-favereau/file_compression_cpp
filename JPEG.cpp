@@ -48,7 +48,7 @@ namespace jpeg {
         //Push one last time
         sectors.push_back({imageBytes.begin() + i, imageBytes.begin() + nextIndex});
         //Raw data
-        sectors.push_back({imageBytes.begin() + nextIndex, imageBytes.end()});
+        sectors.push_back({imageBytes.begin() + nextIndex, imageBytes.end() - 2}); // remove EOI marker
         return sectors;
     }
 
@@ -80,8 +80,18 @@ namespace jpeg {
                     //huffmanTables[0].push_back(Huffman(sector));
                 } else if (marker == 0xffda) {
                     //SOS
+                    int i = 0x05;
+                    int N = ByteReading::readBytes(sector, 4, 1);
+                    for (int j = 0; j < N; j++) {
+                        int ic = ByteReading::readBytes(sector, i, 1);
+                        int ihdc = ByteReading::readByte(sector[i + 1], 0, 4);
+                        int ihac = ByteReading::readByte(sector[i + 1], 4, 4);
+                        arrayInfoBrut.push_back(InfoBrut{.ic = ic, .ihAC = ihac, .ihDC = ihdc});
+                        i += 2;
+                    }
                 } else {
                     //Raw Data
+                    rawData = sector;
                 }
             }
         }
