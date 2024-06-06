@@ -159,15 +159,13 @@
             code += bitReader.nextBit();
             if (huffmanDC.contains(code)){
                 magnitude = huffmanDC.find(code);
-                code = 0;
                 break;
             }
         }
+
         //DC Value reading (code = 0)
         code = readNBits(bitReader, magnitude);
-
         res.values.push_back(decodeMagnitude(code, magnitude) + previousDC);
-
         code = 0;
 
         //-------------------AC----------------------
