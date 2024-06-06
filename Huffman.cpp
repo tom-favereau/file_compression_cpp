@@ -32,9 +32,15 @@ void Huffman::buildCode(const std::vector<char>& sector) {
     }
 }
 
-std::vector<uint8_t> Huffman::readBlock(const uint8_t& previousDC, const std::vector<char> &sector) {
-    
+uint8_t Huffman::find(const uint16_t code) const{
+    return huffman_codes.at(code);
 }
+
+bool Huffman::contains(const uint16_t code) const {
+    return (huffman_codes.contains(code));
+}
+
+
 
 bool Huffman::isAC() {
     return type;

@@ -12,8 +12,9 @@
 #include "Huffman.h"
 #include <fstream>
 #include <iostream>
+#include "BitReader.h"
 
-namespace jpeg {
+
 
     struct InfoComposante {
         int ic; // indice de composante horizontal
@@ -26,6 +27,13 @@ namespace jpeg {
         int ic; //indice composante
         int ihAC; //indice huffman
         int ihDC; //indice huffman
+    };
+
+    struct Block{
+        int start;
+        int end;
+        std::vector<uint8_t> values;
+        int composante; //0 Y, 1 Cb, 2 Cr
     };
 
     class JPEG {
@@ -54,10 +62,14 @@ namespace jpeg {
 
     public:
         explicit JPEG(const std::string& file_name);
+
+        Block readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, const std::vector<char>& sector, BitReader& bitReader) const;
+
+        //static methods
         static std::vector<char> getBytes(const std::string& filename);
+
         static std::vector<std::vector<char>> getSectors(const std::vector<char>& imageBytes);
     };
 
-} // jpeg
 
 #endif //FILE_COMPRESSION_CPP_JPEG_H

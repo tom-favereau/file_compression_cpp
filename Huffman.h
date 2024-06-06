@@ -20,6 +20,8 @@
     } huff_table_t;
 
 
+
+
     class Huffman {
     private:
         //sur un seul octet on a ces information
@@ -28,7 +30,7 @@
 
         uint8_t nb_symboles[16]{};
 
-        std::unordered_map<uint8_t , uint16_t> huffman_codes;
+        std::unordered_map<uint16_t , uint8_t> huffman_codes;
 
         void buildCode(const std::vector<char>& sector);
 
@@ -36,7 +38,11 @@
 
     public:
         Huffman(const std::vector<char>& sector);
-        std::vector<uint8_t> readBlock(const uint8_t& previousDC, const std::vector<char>& sector);
+
+        uint8_t find(const uint16_t code) const;
+
+        bool contains(const uint16_t code) const;
+
         bool isAC();
 
     };

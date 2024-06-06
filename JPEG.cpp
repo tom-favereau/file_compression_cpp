@@ -4,7 +4,7 @@
 
 #include "JPEG.h"
 
-namespace jpeg {
+
 
     /***
      * Reads a jpeg in binary.
@@ -107,5 +107,26 @@ namespace jpeg {
                 }
             }
         }
-}
+
+    Block JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, const std::vector<char> &sector, BitReader& bitReader) const {
+        Huffman huffmanDC = DCHuffmanTables[indexDC];
+        Huffman huffmanAC =  ACHuffmanTables[indexAC];
+        Block res;
+
+        uint16_t code = 0;
+        while (true){
+            code <<= 1;
+            code += bitReader.nextBit();
+            if (huffmanDC.contains(code)){
+                res.values.push_back(huffmanDC.find(code));
+            }
+        }
+
+        for (int i = 0; i < 63; i++){
+
+        }
+
+
+    }
+
  // jpeg
