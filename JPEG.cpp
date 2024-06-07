@@ -109,14 +109,6 @@
         }
     }
 
-    uint16_t readNBits(BitReader& bitReader, int N){
-        int code = 0;
-        for (int i = 0; i < N; i++){
-            code <<= 1;
-            code += bitReader.nextBit();
-        }
-    }
-
     void addNZeroes(Block& block, int N) {
         for (int i = 0; i < N; i++){
             block.values.push_back(0);
@@ -130,22 +122,20 @@
     }
 
     uint16_t powerTwo(uint8_t magnitude) {
-        uint16_t res = 1;
-        for (int i = 0; i < magnitude; i++) {
-            res = res << 1;
+        return 1 << magnitude;
+    }
+
+    int decodeMagnitude(uint16_t code, uint8_t magnitude) {
+        int res;
+        if (code >= powerTwo(magnitude - 1)) {
+            res = code;
+        } else {
+            res = code - (powerTwo(magnitude) - 1);
         }
         return res;
     }
 
-    uint8_t decodeMagnitude(uint16_t code, uint8_t magnitude) {
-        if (code > powerTwo(magnitude - 1)) {
-            return code;
-        } else {
-            return code - (powerTwo(magnitude) - 1);
-        }
-    }
-
-    Block JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, const std::vector<char> &sector, BitReader& bitReader) const {
+    Block JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader) const {
         const auto& huffmanDC = DCHuffmanTables[indexDC];
         const auto& huffmanAC =  ACHuffmanTables[indexAC];
         Block res;
@@ -164,7 +154,7 @@
         }
 
         //DC Value reading (code = 0)
-        code = readNBits(bitReader, magnitude);
+        code = bitReader.nextNBits(magnitude);
         res.values.push_back(decodeMagnitude(code, magnitude) + previousDC);
         code = 0;
 
@@ -187,11 +177,42 @@
                     int skipZeros = ByteReading::readByte(byte, 0, 4);
                     addNZeroes(res, skipZeros);
                     magnitude = ByteReading::readByte(byte, 4, 4);
-                    code = readNBits(bitReader, magnitude);
+                    code = bitReader.nextNBits(magnitude);
                     res.values.push_back(decodeMagnitude(code, magnitude));
                     code = 0;
                 }
             }
         }
+        return res;
+    }
+
+    std::vector<Block> JPEG::readBlocks() {
+        BitReader br = BitReader(rawData);
+        std::vector<Block> blocks;
+        int mcuHeight = (height + 7) / 8;
+        int mcuWidth = (width + 7) / 8;
+
+        std::unordered_map<int, int> colorOrder; //key: SOS, value: SOF
+        for (int i = 0; i < nb_comp; i++) {
+            int indexInSOS;
+            for (int j = 0; j < nb_comp; j++){
+                if (arrayInfoComposante[j].ic == arrayInfoBrut[i].ic) {
+                    indexInSOS = j;
+                }
+            }
+            colorOrder[i] = indexInSOS;
+        }
+
+        int previousDC[3] = {0};
+        for (int i = 0; i < mcuHeight * mcuWidth; i++) {
+            for (int j = 0; j < nb_comp; j++) {
+                for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
+                    blocks.push_back(readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br));
+                    previousDC[j] = blocks[blocks.size() - 1].values[0];
+                }
+            }
+        }
+        int size = br.getSectorSize();
+        return blocks;
     }
  // jpeg

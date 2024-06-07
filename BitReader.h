@@ -13,14 +13,17 @@ class BitReader {
 public:
     explicit BitReader(const std::vector<char>& sector);
     uint8_t nextBit();
+
+    uint16_t nextNBits(int N);
+    bool hasNextByte();
+    int getSectorSize();
 private:
     int currentByteIndex;
     uint8_t currentByte;
     int currentSectorIndex;
     std::vector<uint8_t> sector;
-
-    bool hasNextByte();
     static std::vector<uint8_t> trim(const std::vector<char>& sector);
+
 };
 
 

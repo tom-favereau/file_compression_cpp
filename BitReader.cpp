@@ -11,7 +11,7 @@ BitReader::BitReader(const std::vector<char>& sector) : currentByteIndex(-1), cu
 }
 
 bool BitReader::hasNextByte(){
-    return currentSectorIndex < sector.size();
+    return currentSectorIndex + 1 < sector.size();
 }
 
 uint8_t BitReader::nextBit() {
@@ -26,6 +26,16 @@ uint8_t BitReader::nextBit() {
     currentByteIndex = (currentByteIndex + 1) % 8;
     uint8_t bit = (currentByte >> (7 - currentByteIndex)) & 1;
     return bit;
+}
+
+uint16_t BitReader::nextNBits(int N){
+    //TODO MAKE THIS MORE SECURE (-1 and N <= 0)
+    uint16_t res = 0;
+    for (int i = 0; i < N; i++){
+        res <<= 1;
+        res += BitReader::nextBit();
+    }
+    return res;
 }
 
 //TODO TEST
@@ -57,4 +67,8 @@ std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
         }
     }
     return res;
+}
+
+int BitReader::getSectorSize() {
+    return sector.size();
 }

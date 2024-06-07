@@ -25,14 +25,12 @@ int main() {
     std::cout << "(1, 6) : " << quantisation_table::QuantisationTable::access(1, 6) << std::endl;
     std::cout << "(7, 0) : " << quantisation_table::QuantisationTable::access(7, 0) << std::endl;
 
+    auto francois_Blocks = francois.readBlocks();
+
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
             std::cout << i << " " << j << " : " << quantisation_table::QuantisationTable::access(i, j) << std::endl;
         }
     }
 
-    BitReader br = BitReader(sectors[0]);
-    for (int i = 0; i < 32; i++){
-        std::cout << br.nextBit() << std:: endl;
-    }
 }
