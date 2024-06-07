@@ -17,6 +17,8 @@ public:
     uint16_t nextNBits(int N);
     bool hasNextByte();
     int getSectorSize();
+    int getCurrentByteIndex() const;
+    int getCurrentSectorIndex() const;
 private:
     int currentByteIndex;
     uint8_t currentByte;

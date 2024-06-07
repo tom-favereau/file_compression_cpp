@@ -30,10 +30,11 @@
     };
 
     struct Block{
-        int start;
-        int end;
+        int start = -1;
+        int end = -1;
         std::vector<int> values;
-        int composante; //0 Y, 1 Cb, 2 Cr
+        int composante = -1; //0 Y, 1 Cb, 2 Cr
+        int blockNumber = -1;
     };
 
     class JPEG {
@@ -63,7 +64,7 @@
     public:
         explicit JPEG(const std::string& file_name);
 
-        Block readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader) const;
+        bool readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const;
 
         //static methods
         static std::vector<char> getBytes(const std::string& filename);

@@ -135,10 +135,15 @@
         return res;
     }
 
-    Block JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader) const {
+    bool JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
+        Block res;
+        if (!bitReader.hasNextByte()) {
+            std::cerr << "BR NO MORE" << std::endl;
+            return false;
+        }
         const auto& huffmanDC = DCHuffmanTables[indexDC];
         const auto& huffmanAC =  ACHuffmanTables[indexAC];
-        Block res;
+
 
         uint16_t code = 0;
         uint8_t magnitude;
@@ -183,7 +188,11 @@
                 }
             }
         }
-        return res;
+        if (res.values.size() != 64) {
+            std::cerr << "BLOCK IS NOT 64 LONG" << std::endl;
+        }
+        blocks.push_back(res);
+        return true;
     }
 
     std::vector<Block> JPEG::readBlocks() {
@@ -215,16 +224,22 @@
         }
 
         int previousDC[3] = {0};
-
-        while (br.hasNextByte()){
+        int count = 0;
+        bool loop = true;
+        while (loop) {
             for (int j = 0; j < nb_comp; j++) {
                 for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
-                    blocks.push_back(readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br));
-                    previousDC[j] = blocks[blocks.size() - 1].values[0];
+                    loop = readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br, blocks);
+                    if (loop) {
+                        previousDC[j] = blocks[blocks.size() - 1].values[0];
+                        blocks[blocks.size() - 1].blockNumber = count;
+                        count++;
+                        blocks[blocks.size() - 1].composante = j;
+                    }
                 }
             }
         }
-        int size = br.getSectorSize();
+        std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
         return blocks;
     }
  // jpeg
