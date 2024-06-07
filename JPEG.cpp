@@ -192,7 +192,16 @@
         int mcuHeight = (height + 7) / 8;
         int mcuWidth = (width + 7) / 8;
 
+        if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
+            mcuHeight++;
+        }
+
+        if (mcuWidth % 2 && arrayInfoComposante[0].fh == 2) {
+            mcuWidth++;
+        }
+
         std::unordered_map<int, int> colorOrder; //key: SOS, value: SOF
+
         for (int i = 0; i < nb_comp; i++) {
             int indexInSOS;
             for (int j = 0; j < nb_comp; j++){
@@ -204,6 +213,7 @@
         }
 
         int previousDC[3] = {0};
+
         for (int i = 0; i < mcuHeight * mcuWidth; i++) {
             for (int j = 0; j < nb_comp; j++) {
                 for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
