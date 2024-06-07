@@ -137,7 +137,7 @@
 
     bool JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
         Block res;
-        if (!bitReader.hasNextByte()) {
+        if (!bitReader.hasNextBit()) {
             std::cerr << "BR NO MORE" << std::endl;
             return false;
         }
@@ -163,11 +163,11 @@
         res.values.push_back(decodeMagnitude(code, magnitude) + previousDC);
         code = 0;
 
+
         //-------------------AC----------------------
         while(res.values.size() < 64) {
             code <<= 1;
             code += bitReader.nextBit();
-
             if (huffmanAC.contains(code)){
                 //if code is valid
                 uint8_t byte = huffmanAC.find(code);

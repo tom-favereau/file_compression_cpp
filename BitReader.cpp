@@ -38,6 +38,7 @@ uint16_t BitReader::nextNBits(int N){
         auto nextBit = BitReader::nextBit();
         if (nextBit == 255) {
             std::cerr << "BIT READER FINISHED" << std::endl;
+            break;
         } else {
             res += nextBit;
         }
@@ -87,4 +88,13 @@ int BitReader::getCurrentByteIndex() const {
 
 int BitReader::getCurrentSectorIndex() const {
     return currentSectorIndex;
+}
+
+bool BitReader::hasNextBit() {
+    if (BitReader::hasNextByte()) {
+        return true;
+    } else {
+        return currentByteIndex < 7;
+    }
+
 }

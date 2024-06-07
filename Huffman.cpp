@@ -11,7 +11,7 @@ Huffman::Huffman(const std::vector<char>& sector){
     type = ByteReading::readByte(sector[4], 0, 4);
     indice_huffman = ByteReading::readByte(sector[4], 4, 4);
     for (int i = 0; i < 16; i++){
-        nb_symboles[i] = ByteReading::readBytes(sector, 0x05+i, 1);
+        nb_symboles[i] = ByteReading::readBytes(sector, 0x05 + i, 1);
     }
 
     buildCode(sector);
@@ -24,7 +24,7 @@ void Huffman::buildCode(const std::vector<char>& sector) {
     uint16_t code = 0;
     for (int nb : nb_symboles){
         for (int j = 0; j < nb; j++){
-            huffman_codes[(uint8_t) sector[21+count]] = code;
+            huffman_codes[code] = (uint8_t) sector[0x15 + count];
             code++;
             count++;
         }

@@ -30,7 +30,7 @@
 
         uint8_t nb_symboles[16]{};
 
-        std::unordered_map<uint16_t , uint8_t> huffman_codes;
+        std::unordered_map<uint16_t, uint8_t> huffman_codes;
 
         void buildCode(const std::vector<char>& sector);
 
