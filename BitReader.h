@@ -20,6 +20,7 @@ public:
     int getSectorSize();
     int getCurrentByteIndex() const;
     int getCurrentSectorIndex() const;
+    int getCurrentByte() const;
 private:
     int currentByteIndex;
     uint8_t currentByte;

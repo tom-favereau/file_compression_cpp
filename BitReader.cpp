@@ -69,6 +69,10 @@ std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
                     //TODO Raise exception
                     std::cerr << "Multiple 0xff not supported" << std::endl;
                     break;
+                } else if (nextByte == 0xFE) {
+                    //TODO Raise exception
+                    std::cerr << "COM not supported" << std::endl;
+                    break;
                 }
             } else {
                 res.push_back(sectorToTrim[i]);
@@ -94,7 +98,15 @@ bool BitReader::hasNextBit() {
     if (BitReader::hasNextByte()) {
         return true;
     } else {
-        return currentByteIndex < 7;
+        if (currentByteIndex < 7) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+}
+
+int BitReader::getCurrentByte() const {
+    return (int) currentByte;
 }

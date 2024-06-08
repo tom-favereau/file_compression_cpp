@@ -65,6 +65,7 @@
                 std::cerr << "DRI NOT YET SUPPORTED" << std::endl;
             } else if (marker > 0xffe0 && marker <= 0xffef) {
                 //TODO APPn exception not handled
+                std::cerr << "APPn not handled" << std::endl;
             } else if (marker == 0xffdb) {
                 //DQT
                 quantisationTables.push_back(quantisation_table::QuantisationTable(sector));
@@ -83,6 +84,7 @@
                 }
             } else if ((marker > 0xffc0 && marker <= 0xffc3) || (marker >= 0xffc5 && marker <= 0xffc7) ) {
                 //TODO Compression not handled
+                std::cerr << "Compression not handled" << std::endl;
             } else if (marker == 0xffc4) {
                 //DHT
                 Huffman huff = Huffman(sector);
@@ -150,11 +152,7 @@
         int size = 0;
 
         //-----------------DC---------------
-        while (true){
-            if (!bitReader.hasNextBit()) {
-                std::cerr << "BR NO MORE" << std::endl;
-                break;
-            }
+        while (bitReader.hasNextBit()){
             code <<= 1;
             code += bitReader.nextBit();
             size++;
@@ -197,7 +195,11 @@
             }
         }
         if (res.values.size() != 64) {
-            std::cerr << "BLOCK IS NOT 64 LONG" << std::endl;
+            std::cerr << "BLOCK IS " << res.values.size() << " LONG" << std::endl;
+            std::cerr << "Current Sector index: " << bitReader.getCurrentSectorIndex() << std::endl;
+            std::cerr << "Current Byte index: " << bitReader.getCurrentByteIndex() << std::endl;
+            std::cerr << blocks.size() << " blocks." << std::endl;
+            return false;
         }
         blocks.push_back(res);
         return true;
@@ -206,18 +208,19 @@
     std::vector<Block> JPEG::readBlocks() {
         BitReader br = BitReader(rawData);
         std::vector<Block> blocks;
-        /**
-        int mcuHeight = (height + 7) / 8;
-        int mcuWidth = (width + 7) / 8;
+
+        int mcuHeight = (height ) / 8;
+        int mcuWidth = (width ) / 8;
 
         if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
             mcuHeight++;
+        }
 
 
         if (mcuWidth % 2 && arrayInfoComposante[0].fh == 2) {
             mcuWidth++;
         }
-        */
+
 
         std::unordered_map<int, int> colorOrder; //key: SOS, value: SOF
 
@@ -233,23 +236,29 @@
 
         int previousDC[3] = {0};
         int count = 0;
-        bool loop = true;
-        while (loop) {
+        for (int i = 0; i < mcuWidth * mcuHeight; i++) {
             for (int j = 0; j < nb_comp; j++) {
                 for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
-                    loop = readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br, blocks);
+                    bool loop = readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br, blocks);
                     if (loop) {
                         previousDC[j] = blocks[blocks.size() - 1].values[0];
                         blocks[blocks.size() - 1].blockNumber = count;
                         count++;
                         blocks[blocks.size() - 1].composante = j;
+                    } else {
+                        std::cerr << "READING INTERRUPTED" << std::endl;
+                        std::cerr << "Current Sector index: " << br.getCurrentSectorIndex() << std::endl;
+                        std::cerr << "Current Byte index: " << br.getCurrentByteIndex() << std::endl;
+                        std::cerr << blocks.size() << " blocks." << std::endl;
+                        std::cerr << "Composante " << j << ", " << "k = " << k << std::endl;
+                        break;
                     }
                 }
             }
         }
-        std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
-        std::cerr << br.getSectorSize() << std::endl;
-        std::cerr << br.getCurrentSectorIndex() << std::endl;
+        //std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
+        std::cout << "Last Byte " << br.getCurrentByte() << std::endl;
         return blocks;
     }
+
  // jpeg
