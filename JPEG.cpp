@@ -147,13 +147,20 @@
 
         uint16_t code = 0;
         uint8_t magnitude;
+        int size = 0;
 
         //-----------------DC---------------
         while (true){
+            if (!bitReader.hasNextBit()) {
+                std::cerr << "BR NO MORE" << std::endl;
+                break;
+            }
             code <<= 1;
             code += bitReader.nextBit();
-            if (huffmanDC.contains(code)){
+            size++;
+            if (huffmanDC.contains(code, size)){
                 magnitude = huffmanDC.find(code);
+                size = 0;
                 break;
             }
         }
@@ -163,15 +170,16 @@
         res.values.push_back(decodeMagnitude(code, magnitude) + previousDC);
         code = 0;
 
-
         //-------------------AC----------------------
-        while(res.values.size() < 64) {
+        while(res.values.size() < 64 && bitReader.hasNextBit()) {
             code <<= 1;
             code += bitReader.nextBit();
-            if (huffmanAC.contains(code)){
+            size++;
+            if (huffmanAC.contains(code, size)){
                 //if code is valid
                 uint8_t byte = huffmanAC.find(code);
                 code = 0;
+                size = 0;
                 if (byte == 0xF0) {
                     //16 zeroes
                     addNZeroes(res, 16);
@@ -240,6 +248,8 @@
             }
         }
         std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
+        std::cerr << br.getSectorSize() << std::endl;
+        std::cerr << br.getCurrentSectorIndex() << std::endl;
         return blocks;
     }
  // jpeg

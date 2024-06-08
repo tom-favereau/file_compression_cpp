@@ -34,6 +34,8 @@
 
         void buildCode(const std::vector<char>& sector);
 
+        std::vector<std::vector<uint16_t>> huffman_offset;
+
 
 
     public:
@@ -41,7 +43,7 @@
 
         uint8_t find(const uint16_t code) const;
 
-        bool contains(const uint16_t code) const;
+        bool contains(uint16_t code, int size) const;
 
         bool isAC();
 

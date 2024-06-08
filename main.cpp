@@ -6,6 +6,9 @@ int main() {
 
     std::string filename_a = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/alexandria.jpeg)";
     std::string filename_f = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/francois.jpg)";
+    std::string filename_c = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/cat.jpg)";
+    std::string filename_g = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/goldfish_2to1H.jpg)";
+
     auto filestream = JPEG::getBytes(filename_a);
     auto sectors = JPEG::getSectors(filestream);
     int sector_size = 0;
@@ -19,12 +22,16 @@ int main() {
     std::cout << "Read Byte: " << ByteReading::readByte(c, 2, 4) << std::endl;
     JPEG alexandria = JPEG(filename_a);
     JPEG francois = JPEG(filename_f);
+    JPEG cat = JPEG(filename_c);
+    JPEG goldfish = JPEG(filename_g);
 
     std::cout << "(4, 5) : " << quantisation_table::QuantisationTable::access(4, 5) << std::endl;
     std::cout << "(7, 7) : " << quantisation_table::QuantisationTable::access(7, 7) << std::endl;
     std::cout << "(1, 6) : " << quantisation_table::QuantisationTable::access(1, 6) << std::endl;
     std::cout << "(7, 0) : " << quantisation_table::QuantisationTable::access(7, 0) << std::endl;
 
+    auto gold_Blocks = goldfish.readBlocks();
+    auto cat_Blocks = cat.readBlocks();
     auto francois_Blocks = francois.readBlocks();
 
     for (int i = 0; i < 8; i++){
