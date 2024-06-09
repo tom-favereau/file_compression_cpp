@@ -69,7 +69,7 @@
                 std::cerr << "APPn not handled" << std::endl;
             } else if (marker == 0xffdb) {
                 //DQT
-                quantisationTables.push_back(quantisation_table::QuantisationTable(sector));
+                quantisationTables.push_back(QuantisationTable(sector));
             } else if (marker == 0xffc0) {
                 //SOF0
                 precision = ByteReading::readBytes(sector, 4, 1);
@@ -109,6 +109,30 @@
                 //Raw Data
                 rawData = sector;
             }
+        }
+        mcuHeight = (height + 7) / 8;
+        mcuWidth = (width + 7) / 8;
+
+        if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
+            mcuHeight++;
+        }
+
+
+        if (mcuWidth % 2 && arrayInfoComposante[0].fh == 2) {
+            mcuWidth++;
+        }
+
+
+
+
+        for (int i = 0; i < nb_comp; i++) {
+            int indexInSOS;
+            for (int j = 0; j < nb_comp; j++){
+                if (arrayInfoComposante[j].ic == arrayInfoBrut[i].ic) {
+                    indexInSOS = j;
+                }
+            }
+            colorOrder[i] = indexInSOS;
         }
     }
 
@@ -210,30 +234,7 @@
         BitReader br = BitReader(rawData);
         std::vector<Block> blocks;
 
-        int mcuHeight = (height + 7) / 8;
-        int mcuWidth = (width + 7) / 8;
 
-        if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
-            mcuHeight++;
-        }
-
-
-        if (mcuWidth % 2 && arrayInfoComposante[0].fh == 2) {
-            mcuWidth++;
-        }
-
-
-        std::unordered_map<int, int> colorOrder; //key: SOS, value: SOF
-
-        for (int i = 0; i < nb_comp; i++) {
-            int indexInSOS;
-            for (int j = 0; j < nb_comp; j++){
-                if (arrayInfoComposante[j].ic == arrayInfoBrut[i].ic) {
-                    indexInSOS = j;
-                }
-            }
-            colorOrder[i] = indexInSOS;
-        }
 
         int previousDC[3] = {0};
         int count = 0;
@@ -259,10 +260,11 @@
         }
         //std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
         std::cout << "Last Byte " << br.getCurrentByte() << std::endl;
+        std::cout << "Last Byte index " << br.getCurrentByteIndex() << std::endl;
         return blocks;
     }
 
-    double JPEG::InverseCosinusTransform(int x, int y, int quantisationTableIndex){
+    double JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
         double sum = 0;
         double Clambda = 0;
         double Cmu = 0;
@@ -271,43 +273,24 @@
             for (int mu = 0; mu < 8; mu++){
                 if (mu == 0){
                     Cmu = 1/ sqrt(2);
+                } else {
+                    Cmu = 1;
                 }
                 if (lambda == 0){
                     Clambda = 1/ sqrt(2);
+                } else {
+                    Clambda = 1;
                 }
 
-                sum += Cmu * Clambda * cos( (2 * x + 1) * lambda * pi / 16) * cos((2 * y + 1) * mu * pi / 16) * quantisationTables[quantisationTableIndex].elementAt(lambda, mu);
+                sum += Cmu * Clambda * cos( (2 * x + 1) * lambda * pi / 16) * cos((2 * y + 1) * mu * pi / 16) *
+                        quantisationTables[quantisationTableIndex].elementAt(lambda, mu) *
+                        frequentialBlock.values[QuantisationTable::access(lambda, mu)];
             }
         }
         return 1/4 * sum;
     }
 
     std::vector<std::vector<std::vector<double>>> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
-        // auxiliaire
-        std::unordered_map<int, int> colorOrder; //key: SOS, value: SOF
-
-        for (int i = 0; i < nb_comp; i++) {
-            int indexInSOS;
-            for (int j = 0; j < nb_comp; j++){
-                if (arrayInfoComposante[j].ic == arrayInfoBrut[i].ic) {
-                    indexInSOS = j;
-                }
-            }
-            colorOrder[i] = indexInSOS;
-        }
-
-        int mcuHeight = (height + 7) / 8;
-        int mcuWidth = (width + 7) / 8;
-
-        if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
-            mcuHeight++;
-        }
-
-
-        if (mcuWidth % 2 && arrayInfoComposante[0].fh == 2) {
-            mcuWidth++;
-        }
-        //-------------------//
 
         std::vector<std::vector<std::vector<double>>> spatialBlocks;
         int count = 0;
@@ -318,7 +301,9 @@
                     for (int x = 0; x < 8; x++){
                         std::vector<double> ligneY;
                         for (int y = 0; y < 8; y++){
-                            ligneY.push_back(InverseCosinusTransform(x, y, colorOrder[j]));
+                            ligneY.push_back(InverseQuantisationCosinusTransform(x, y,
+                                                                                 arrayInfoComposante[colorOrder[j]].iq,
+                                                                                 frequentialBlocks[count]));
                         }
                         colonneX.push_back(ligneY);
                     }
@@ -327,7 +312,36 @@
                 }
             }
         }
+        return spatialBlocks;
     }
+
+    YCbCr JPEG::upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks){
+
+    }
+
+
+std::vector<std::vector<Pixel>> JPEG::upscale(std::vector<std::vector<std::vector<double>>> spatialBlocks) {
+    std::vector<std::vector<Pixel>> imageYCC;
+    for (int i = 0; i < height; i++){
+        std::vector<Pixel> ligne(width);
+        imageYCC.push_back(ligne);
+    }
+
+
+
+    int count = 0;
+    for (int i = 0; i < mcuWidth * mcuHeight; i++) {
+        for (int j = 0; j < nb_comp; j++) {
+            for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh; k++) {
+                for (int l = 0; l < arrayInfoComposante[colorOrder[j]].fv; l++) {
+
+                }
+
+            }
+        }
+    }
+    return imageYCC;
+}
 
 
 

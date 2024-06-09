@@ -22,14 +22,14 @@ int main() {
 
     char c = '\010';
     std::cout << "Read Byte: " << ByteReading::readByte(c, 2, 4) << std::endl;
-    std::cout << "(4, 5) : " << quantisation_table::QuantisationTable::access(4, 5) << std::endl;
-    std::cout << "(7, 7) : " << quantisation_table::QuantisationTable::access(7, 7) << std::endl;
-    std::cout << "(1, 6) : " << quantisation_table::QuantisationTable::access(1, 6) << std::endl;
-    std::cout << "(7, 0) : " << quantisation_table::QuantisationTable::access(7, 0) << std::endl;
+    std::cout << "(4, 5) : " << QuantisationTable::access(4, 5) << std::endl;
+    std::cout << "(7, 7) : " << QuantisationTable::access(7, 7) << std::endl;
+    std::cout << "(1, 6) : " << QuantisationTable::access(1, 6) << std::endl;
+    std::cout << "(7, 0) : " << QuantisationTable::access(7, 0) << std::endl;
 
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
-            std::cout << i << " " << j << " : " << quantisation_table::QuantisationTable::access(i, j) << std::endl;
+            std::cout << i << " " << j << " : " << QuantisationTable::access(i, j) << std::endl;
         }
     }
 

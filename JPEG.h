@@ -37,6 +37,18 @@
         int blockNumber = -1;
     };
 
+    struct Pixel{
+        double comp1;
+        double comp2;
+        double comp3;
+    };
+
+    struct YCbCr{
+        std::vector<std::vector<std::vector<double>>> Y;
+        std::vector<std::vector<std::vector<double>>> Cb;
+        std::vector<std::vector<std::vector<double>>> Cr;
+    };
+
 
     class JPEG {
 
@@ -48,6 +60,13 @@
         uint16_t width;
         uint8_t nb_comp; //couleur ou non
         std::vector<InfoComposante> arrayInfoComposante; //tableau de taille nb_com
+
+        //colorOder
+        std::unordered_map<int, int> colorOrder;
+
+        //mcuHeights mcuWidth
+        int mcuHeight;
+        int mcuWidth;
 
         //Define Quantization Tables
         std::vector<QuantisationTable> quantisationTables;
@@ -62,6 +81,9 @@
         //Raw Data
         std::vector<char> rawData;
 
+
+
+
     public:
         explicit JPEG(const std::string& file_name);
 
@@ -74,9 +96,13 @@
 
         std::vector<Block> readBlocks();
 
-        double InverseCosinusTransform(int x, int y, int quantisationTableIndex);
+        double InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock);
 
         std::vector<std::vector<std::vector<double>>> getSpatialBlocks(std::vector<Block> frequentialBlocks);
+
+        YCbCr upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks);
+
+        std::vector<std::vector<Pixel>> upscale(std::vector<std::vector<std::vector<double>>> spatialBlocks);
     };
 
 
