@@ -6,19 +6,28 @@
 #define FILE_COMPRESSION_CPP_QUANTISATIONTABLE_H
 #include <cstdint>
 #include <vector>
-namespace quantisation_table {
+
 
     class QuantisationTable {
+    private:
         bool precision;
+
         uint8_t iq; //indice de la table
+
         std::vector<char> values;
+
     public:
         explicit QuantisationTable(std::vector<char> sector);
+
         static int access(int i, int j);
+
+        uint8_t elementAt(int i, int j) const;
+
+
     };
 
 
 
-} // quantisation_table
+
 
 #endif //FILE_COMPRESSION_CPP_QUANTISATIONTABLE_H

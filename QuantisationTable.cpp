@@ -4,7 +4,7 @@
 
 #include "QuantisationTable.h"
 #include "ByteReading.h"
-namespace quantisation_table {
+
     QuantisationTable::QuantisationTable(std::vector<char> sector){
         precision = ByteReading::readByte(sector[4], 0, 4) == 0;
         iq = ByteReading::readByte(sector[4], 4, 4);
@@ -38,4 +38,8 @@ namespace quantisation_table {
             }
         }
     }
-} // quantisation_table
+
+
+    uint8_t QuantisationTable::elementAt(int i, int j) const{
+        return values[access(i, j)];
+    }

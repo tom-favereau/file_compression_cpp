@@ -37,6 +37,7 @@
         int blockNumber = -1;
     };
 
+
     class JPEG {
 
     private:
@@ -49,7 +50,7 @@
         std::vector<InfoComposante> arrayInfoComposante; //tableau de taille nb_com
 
         //Define Quantization Tables
-        std::vector<quantisation_table::QuantisationTable> quantisationTables;
+        std::vector<QuantisationTable> quantisationTables;
 
         //Define Huffman Tables
         std::vector<Huffman> DCHuffmanTables;
@@ -72,6 +73,10 @@
         static std::vector<std::vector<char>> getSectors(const std::vector<char>& imageBytes);
 
         std::vector<Block> readBlocks();
+
+        double InverseCosinusTransform(int x, int y, int quantisationTableIndex);
+
+        std::vector<std::vector<std::vector<double>>> getSpatialBlocks(std::vector<Block> frequentialBlocks);
     };
 
 
