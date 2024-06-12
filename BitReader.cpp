@@ -56,9 +56,9 @@ std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
             skipNext = false;
         } else {
             uint8_t byte = sectorToTrim[i];
-            if (byte == 0xff){
+            if (byte == 0xFF){
                 uint8_t nextByte = sectorToTrim[i + 1];
-                if (nextByte >= 0xd0 && nextByte <= 0xd7) {
+                if (nextByte >= 0xD0 && nextByte <= 0xD7) {
                     //TODO Raise exception
                     std::cerr << "DRI not supported" << std::endl;
                     break;
@@ -73,6 +73,9 @@ std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
                     //TODO Raise exception
                     std::cerr << "COM not supported" << std::endl;
                     break;
+                } else {
+                    std::cerr << "Unknown marker" << std::endl;
+                    std::cerr << nextByte << std::endl;
                 }
             } else {
                 res.push_back(sectorToTrim[i]);

@@ -259,8 +259,9 @@
             }
         }
         //std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
-        std::cout << "Last Byte " << br.getCurrentByte() << std::endl;
+        std::cout << "Last Byte Read: " << br.getCurrentByte() << " is byte " << br.getCurrentSectorIndex() << " out of " << br.getSectorSize() - 1 << std::endl;
         std::cout << "Last Byte index " << br.getCurrentByteIndex() << std::endl;
+        std::cout << blocks.size() << " blocks." << std::endl;
         return blocks;
     }
 
@@ -343,6 +344,13 @@ std::vector<std::vector<Pixel>> JPEG::upscale(std::vector<std::vector<std::vecto
     return imageYCC;
 }
 
+Pixel YCbCrToRGB(Pixel pixel) {
+        Pixel res{};
+        res.comp1 = pixel.comp1 - 0.0009267 * (pixel.comp2 - 128) + 1.4016868 * (pixel.comp3 - 128);
+        res.comp2 = pixel.comp1 - 0.3436954 * (pixel.comp2 - 128) - 0.7141690 * (pixel.comp3 - 128);
+        res.comp3 = pixel.comp1 + 1.7721604 * (pixel.comp2 - 128) + 0.0009902 * (pixel.comp3 - 128);
+        return res;
+    }
 
 
 // jpeg
