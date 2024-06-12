@@ -400,7 +400,7 @@ YCbCr JPEG::BlocksToYCbCr(std::vector<Block> blocks) {
         return ycbcr;
     }
 
-std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) {
+std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         //SANS UPSCALE
         std::vector<std::vector<Pixel>> res;
         for (int i = 0; i < height; i++) {
