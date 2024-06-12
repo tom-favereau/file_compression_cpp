@@ -273,22 +273,22 @@
         for (int lambda = 0; lambda < 8; lambda++){
             for (int mu = 0; mu < 8; mu++){
                 if (mu == 0){
-                    Cmu = 1/ sqrt(2);
+                    Cmu = 1.0/ sqrt(2.0);
                 } else {
-                    Cmu = 1;
+                    Cmu = 1.0;
                 }
                 if (lambda == 0){
-                    Clambda = 1/ sqrt(2);
+                    Clambda = 1.0/ sqrt(2.0);
                 } else {
-                    Clambda = 1;
+                    Clambda = 1.0;
                 }
 
-                sum += Cmu * Clambda * cos( (2 * x + 1) * lambda * pi / 16) * cos((2 * y + 1) * mu * pi / 16) *
+                sum += Cmu * Clambda * cos( (2.0 * x + 1.0) * lambda * pi / 16.0) * cos((2.0 * y + 1.0) * mu * pi / 16.0) *
                         quantisationTables[quantisationTableIndex].elementAt(lambda, mu) *
                         frequentialBlock.values[QuantisationTable::access(lambda, mu)];
             }
         }
-        return 1/4 * sum;
+        return 1.0/4.0 * sum;
     }
 
     std::vector<std::vector<std::vector<double>>> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
@@ -414,8 +414,8 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         for (int k = 0; k < ycbcr.Y.size(); k++) {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    int x = k / width;
-                    int y = k % width;
+                    int x = k / width + i;
+                    int y = k % width + j;
                     if (x + 8 < height && y + 8 < width) {
                         res[x][y].comp1 = ycbcr.Y[k][i][j];
                         //ONLY FOR FRANCOIS
@@ -426,6 +426,33 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
                 }
             }
         }
+        return res;
     }
+
+
+void JPEG::writePixelsToFile(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename) {
+    std::ofstream file(filename);
+    if (!file) {
+        std::cerr << "Erreur d'ouverture du fichier !" << std::endl;
+        return;
+    }
+    int height = pixels.size();
+    int width = pixels[0].size();
+    file << height << " " << width << std::endl;  // Écrire les dimensions de l'image
+    for (const auto& row : pixels) {
+        for (const auto& pixel : row) {
+            file << pixel.comp1 << " " << pixel.comp2 << " " << pixel.comp3 << " ";
+        }
+        file << std::endl;
+    }
+    file.close();
+}
+
+//void JPEG::display(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename) {
+//    writePixelsToFile(pixels, filename);
+//    std::string tmp = "python3 display.py" + filename;
+//    int result = std::system(tmp);
+
+//}
 
 // jpeg
