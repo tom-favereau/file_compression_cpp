@@ -32,7 +32,7 @@
     struct Block{
         int start = -1;
         int end = -1;
-        std::vector<int> values;
+        std::vector<uint8_t> values;
         int composante = -1; //0 Y, 1 Cb, 2 Cr
         int blockNumber = -1;
     };
@@ -106,11 +106,15 @@
 
         std::vector<Block> upscaledBlock(const Block &blockToUpscale);
 
-        std::vector<std::vector<Pixel>> YCbCrToRGBPixels(const std::vector<std::vector<Pixel>> &pixels);
+        static std::vector<std::vector<Pixel>> YCbCrToRGBPixels(const std::vector<std::vector<Pixel>> &pixels);
 
         std::vector<std::vector<Pixel>> YCbCrToPixels(YCbCr ycbcr);
 
-        YCbCr BlocksToYCbCr(std::vector<Block> blocks);
+        static YCbCr BlocksToYCbCr(std::vector<Block> blocks);
+
+        //static void display(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename);
+
+        static void writePixelsToFile(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename);
     };
 
 
