@@ -3,13 +3,12 @@
 #include "BitReader.h"
 
 int main() {
-
     std::string filename_a = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/alexandria.jpeg)";
-    std::string filename_f = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/francois.jpg)";
+    std::string filename_f = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/francois.jpg)";
     std::string filename_c = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/cat.jpg)";
     std::string filename_g = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/goldfish_2to1H.jpg)";
-    std::string filename_t = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/test.jpeg)";
-    std::string filename_p = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/pick.jpeg)";
+    std::string filename_t = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/test.jpeg)";
+    std::string filename_p = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/pick.jpeg)";
 
     auto filestream = JPEG::getBytes(filename_f);
     auto sectors = JPEG::getSectors(filestream);

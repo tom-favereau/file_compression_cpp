@@ -103,6 +103,14 @@
         YCbCr upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks);
 
         std::vector<std::vector<Pixel>> upscale(std::vector<std::vector<std::vector<double>>> spatialBlocks);
+
+        std::vector<Block> upscaledBlock(const Block &blockToUpscale);
+
+        std::vector<std::vector<Pixel>> YCbCrToRGBPixels(const std::vector<std::vector<Pixel>> &pixels);
+
+        std::vector<std::vector<Pixel>> YCbCrToPixels(YCbCr ycbcr);
+
+        YCbCr BlocksToYCbCr(std::vector<Block> blocks);
     };
 
 

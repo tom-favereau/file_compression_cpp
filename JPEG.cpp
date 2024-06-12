@@ -316,8 +316,18 @@
         return spatialBlocks;
     }
 
-    YCbCr JPEG::upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks){
+    std::vector<Block> JPEG::upscaledBlock(const Block& blockToUpscale) {
+        std::vector<Block> res;
+        //only supports JFIF
+        if (blockToUpscale.composante != arrayInfoComposante[0].ic) {
 
+        } else {
+            res.push_back(blockToUpscale);
+        }
+        return res;
+    }
+
+    YCbCr JPEG::upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks){
     }
 
 
@@ -352,5 +362,70 @@ Pixel YCbCrToRGB(Pixel pixel) {
         return res;
     }
 
+std::vector<std::vector<Pixel>> JPEG::YCbCrToRGBPixels(const std::vector<std::vector<Pixel>>& pixels) {
+        std::vector<std::vector<Pixel>> res;
+        for (int i = 0; i < pixels.size(); i++) {
+            res.push_back(std::vector<Pixel> {});
+        }
+
+        for (int i = 0; i < pixels.size(); i++) {
+            for (int j = 0; j < pixels[0].size(); j++) {
+                res[i].push_back(YCbCrToRGB(pixels[i][j]));
+            }
+        }
+
+        return res;
+    }
+
+YCbCr JPEG::BlocksToYCbCr(std::vector<Block> blocks) {
+        YCbCr ycbcr;
+        for (auto & block : blocks) {
+            std::vector<std::vector<double>> doubleBlock;
+            for (int x = 0; x < 8; x++) {
+                doubleBlock.push_back({});
+                for (int y = 0; y < 8; y++) {
+                    doubleBlock[x].push_back(block.values[QuantisationTable::access(x, y)]);
+                }
+            }
+            if (block.composante == 0) {
+                ycbcr.Y.push_back(doubleBlock);
+            } else if (block.composante == 1) {
+                ycbcr.Cb.push_back(doubleBlock);
+            } else if (block.composante == 2) {
+                ycbcr.Cr.push_back(doubleBlock);
+            } else {
+                std::cerr << "Unknown component in BlocksToYCbCr." << std::endl;
+            }
+        }
+        return ycbcr;
+    }
+
+std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) {
+        //SANS UPSCALE
+        std::vector<std::vector<Pixel>> res;
+        for (int i = 0; i < height; i++) {
+            std::vector<Pixel> line;
+            for (int j = 0; j < width; j++){
+                line.push_back(Pixel{});
+            }
+            res.push_back(line);
+        }
+
+        for (int k = 0; k < ycbcr.Y.size(); k++) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    int x = k / width;
+                    int y = k % width;
+                    if (x + 8 < height && y + 8 < width) {
+                        res[x][y].comp1 = ycbcr.Y[k][i][j];
+                        //ONLY FOR FRANCOIS
+                        //TODO SUPPORT UPSCALING
+                        res[x][y].comp2 = ycbcr.Cb[k][i][j];
+                        res[x][y].comp3 = ycbcr.Cr[k][i][j];
+                    }
+                }
+            }
+        }
+    }
 
 // jpeg
