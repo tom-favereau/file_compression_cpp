@@ -32,15 +32,15 @@
     struct Block{
         int start = -1;
         int end = -1;
-        std::vector<uint8_t> values;
+        std::vector<int> values;
         int composante = -1; //0 Y, 1 Cb, 2 Cr
         int blockNumber = -1;
     };
 
     struct Pixel{
-        double comp1;
-        double comp2;
-        double comp3;
+        uint8_t comp1;
+        uint8_t comp2;
+        uint8_t comp3;
     };
 
     struct YCbCr{
@@ -96,9 +96,9 @@
 
         std::vector<Block> readBlocks();
 
-        double InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock);
+        uint8_t InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock);
 
-        std::vector<std::vector<std::vector<double>>> getSpatialBlocks(std::vector<Block> frequentialBlocks);
+        std::vector<Block> getSpatialBlocks(std::vector<Block> frequentialBlocks);
 
         YCbCr upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks);
 
