@@ -108,13 +108,14 @@
 
         static std::vector<std::vector<Pixel>> YCbCrToRGBPixels(const std::vector<std::vector<Pixel>> &pixels);
 
-        std::vector<std::vector<Pixel>> YCbCrToPixels(YCbCr ycbcr);
+        std::vector<std::vector<Pixel>> YCbCrToPixels(YCbCr ycbcr) const;
 
         static YCbCr BlocksToYCbCr(std::vector<Block> blocks);
 
         //static void display(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename);
 
         static void writePixelsToFile(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename);
+
     };
 
 
