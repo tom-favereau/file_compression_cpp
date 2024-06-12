@@ -288,7 +288,7 @@
                         frequentialBlock.values[QuantisationTable::access(lambda, mu)];
             }
         }
-        return (1.0/4.0 * sum) + 128;
+        return (1.0/4.0 * sum);
     }
 
     std::vector<Block> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
@@ -296,7 +296,7 @@
         std::vector<Block> spatialBlocks;
 
         for (int i = 0; i < frequentialBlocks.size(); i++) {
-            std::vector<uint8_t> values;
+            std::vector<int> values;
             Block test = frequentialBlocks[i];
             for (int x = 0; x < 8; x++) {
 
@@ -353,9 +353,23 @@ std::vector<std::vector<Pixel>> JPEG::upscale(std::vector<std::vector<std::vecto
 
 Pixel YCbCrToRGB(Pixel pixel) {
         Pixel res{};
-        res.comp1 = pixel.comp1 - 0.0009267 * (pixel.comp2 - 128) + 1.4016868 * (pixel.comp3 - 128);
-        res.comp2 = pixel.comp1 - 0.3436954 * (pixel.comp2 - 128) - 0.7141690 * (pixel.comp3 - 128);
-        res.comp3 = pixel.comp1 + 1.7721604 * (pixel.comp2 - 128) + 0.0009902 * (pixel.comp3 - 128);
+
+        int r = pixel.comp1 + 1.402f * pixel.comp3 + 128;
+        int g = pixel.comp1 - 0.344f * pixel.comp2 - 0.714f * pixel.comp3 + 128;
+        int b = pixel.comp1 + 1.772f * pixel.comp2 + 128;
+        if (r < 0)   r = 0;
+        if (r > 255) r = 255;
+        if (g < 0)   g = 0;
+        if (g > 255) g = 255;
+        if (b < 0)   b = 0;
+        if (b > 255) b = 255;
+        res.comp1 = r;
+        res.comp2 = g;
+        res.comp3 = b;
+
+        //res.comp1 = pixel.comp1 - 0.0009267 * (pixel.comp2 - 128) + 1.4016868 * (pixel.comp3 - 128);
+        //res.comp2 = pixel.comp1 - 0.3436954 * (pixel.comp2 - 128) - 0.7141690 * (pixel.comp3 - 128);
+        //res.comp3 = pixel.comp1 + 1.7721604 * (pixel.comp2 - 128) + 0.0009902 * (pixel.comp3 - 128);
         return res;
     }
 

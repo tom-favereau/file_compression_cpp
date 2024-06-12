@@ -32,7 +32,7 @@
     struct Block{
         int start = -1;
         int end = -1;
-        std::vector<uint8_t> values;
+        std::vector<int> values;
         int composante = -1; //0 Y, 1 Cb, 2 Cr
         int blockNumber = -1;
     };
