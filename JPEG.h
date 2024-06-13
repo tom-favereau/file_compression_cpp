@@ -32,15 +32,15 @@
     struct Block{
         int start = -1;
         int end = -1;
-        std::vector<int> values;
+        std::vector<double> values;
         int composante = -1; //0 Y, 1 Cb, 2 Cr
         int blockNumber = -1;
     };
 
     struct Pixel{
-        uint8_t comp1;
-        uint8_t comp2;
-        uint8_t comp3;
+        double comp1;
+        double comp2;
+        double comp3;
     };
 
     struct YCbCr{
@@ -87,7 +87,7 @@
     public:
         explicit JPEG(const std::string& file_name);
 
-        bool readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const;
+        bool readBlock(const int indexDC, const int indexAC, const int& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const;
 
         //static methods
         static std::vector<char> getBytes(const std::string& filename);
@@ -96,7 +96,7 @@
 
         std::vector<Block> readBlocks();
 
-        uint8_t InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock);
+        double InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock);
 
         std::vector<Block> getSpatialBlocks(std::vector<Block> frequentialBlocks);
 

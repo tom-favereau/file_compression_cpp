@@ -162,7 +162,7 @@
         return res;
     }
 
-    bool JPEG::readBlock(const int indexDC, const int indexAC, const uint8_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
+    bool JPEG::readBlock(const int indexDC, const int indexAC, const int& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
         Block res;
         if (!bitReader.hasNextBit()) {
             std::cerr << "BR NO MORE" << std::endl;
@@ -265,7 +265,7 @@
         return blocks;
     }
 
-    uint8_t JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
+    double JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
         double sum = 0;
         double Clambda = 0;
         double Cmu = 0;
@@ -294,9 +294,9 @@
     std::vector<Block> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
 
         std::vector<Block> spatialBlocks;
-
+        https://github.com/dannye/jed.git
         for (int i = 0; i < frequentialBlocks.size(); i++) {
-            std::vector<int> values;
+            std::vector<double> values;
             Block test = frequentialBlocks[i];
             for (int x = 0; x < 8; x++) {
 
@@ -425,16 +425,16 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         for (int k = 0; k < ycbcr.Y.size(); k++) {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    int x = k / width + i;
-                    int y = k % width + j;
+                    int x = 8*(k*8 / width) + i;
+                    int y = (k*8 % width) + j;
                     if (x < height && y < width) {
                         res[x][y].comp1 = ycbcr.Y[k][i][j];
                         //ONLY FOR FRANCOIS
                         //TODO SUPPORT UPSCALING
-                        if (k == 0) {
-                            res[x][y].comp2 = ycbcr.Cb[k][i][j];
-                            res[x][y].comp3 = ycbcr.Cr[k][i][j];
-                        }
+
+                        res[x][y].comp2 = ycbcr.Cb[k][i][j];
+                        res[x][y].comp3 = ycbcr.Cr[k][i][j];
+
                     }
                 }
             }
@@ -454,7 +454,7 @@ void JPEG::writePixelsToFile(const std::vector<std::vector<Pixel>>& pixels, cons
     file << height << " " << width << std::endl;  // Écrire les dimensions de l'image
     for (const auto& row : pixels) {
         for (const auto& pixel : row) {
-            file << (uint64_t) pixel.comp1 << " " << (uint64_t) pixel.comp2 << " " << (uint64_t) pixel.comp3 << " ";
+            file << (int) pixel.comp1 << " " << (int) pixel.comp2 << " " << (int) pixel.comp3 << " ";
         }
         file << std::endl;
     }
