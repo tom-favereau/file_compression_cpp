@@ -114,7 +114,10 @@
                     arrayInfoBrut.push_back(InfoBrut{.ic = ic, .ihAC = ihac, .ihDC = ihdc});
                     i += 2;
                 }
-            } else {
+            } else if (((marker >> 8) & 0xFF) == 0xFF) {
+                std::cerr << "Unknown marker " << (int) marker << std::endl;
+            }
+            else {
                 //Raw Data
                 rawData = sector;
             }
