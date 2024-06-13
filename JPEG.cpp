@@ -64,16 +64,18 @@
                 //TODO Check if image is in JFIF
             } else if (marker == 0xffdd) {
                 //TODO DRI NOT YET SUPPORTED
-                std::cout << "DRI NOT YET SUPPORTED" << std::endl;
+                std::cerr << "DRI NOT YET SUPPORTED" << std::endl;
             } else if (marker > 0xffe0 && marker <= 0xffef) {
                 //TODO APPn exception not handled
                 std::cerr << "APPn not handled" << std::endl;
                 std::cerr << (int) marker << std::endl;
             } else if (marker == 0xffdb) {
                 //DQT
+                std::cout << "DQT DETECTED" << std::endl;
                 quantisationTables.push_back(QuantisationTable(sector));
             } else if (marker == 0xffc0) {
                 //SOF0
+                std::cout << "SOF0 DETECTED" << std::endl;
                 precision = ByteReading::readBytes(sector, 4, 1);
                 height = ByteReading::readBytes(sector, 5, 2);
                 width = ByteReading::readBytes(sector, 7, 2);
@@ -88,16 +90,21 @@
             } else if ((marker > 0xffc0 && marker <= 0xffc3) || (marker >= 0xffc5 && marker <= 0xffc7) ) {
                 //TODO Compression not handled
                 std::cerr << "Compression not handled" << std::endl;
+                std::cerr << (int) marker << std::endl;
             } else if (marker == 0xffc4) {
                 //DHT
+                std::cout << "DHT DETECTED" << std::endl;
                 Huffman huff = Huffman(sector);
                 if (huff.isAC()){
                     ACHuffmanTables.push_back(huff);
                 } else {
                     DCHuffmanTables.push_back(huff);
                 }
+            } else if (marker == 0xFFFE) {
+                std::cout << "COM DETECTED" << std::endl;
             } else if (marker == 0xffda) {
                 //SOS
+                std::cout << "SOS DETECTED" << std::endl;
                 int i = 0x05;
                 int N = ByteReading::readBytes(sector, 4, 1);
                 for (int j = 0; j < N; j++) {

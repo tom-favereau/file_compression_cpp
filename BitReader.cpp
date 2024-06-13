@@ -51,9 +51,11 @@ uint16_t BitReader::nextNBits(int N){
 std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
     std::vector<uint8_t> res;
     bool skipNext = false;
+    int count = 0;
     for (int i = 0; i < sectorToTrim.size(); i++) {
         if (skipNext) {
             skipNext = false;
+            count++;
         } else {
             uint8_t byte = sectorToTrim[i];
             if (byte == 0xFF){
@@ -82,6 +84,7 @@ std::vector<uint8_t> BitReader::trim(const std::vector<char>& sectorToTrim) {
             }
         }
     }
+    std::cout << "Trimmed " << count << std::endl;
     return res;
 }
 
