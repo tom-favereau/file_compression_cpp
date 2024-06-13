@@ -148,11 +148,11 @@
         }
     }
 
-    uint16_t powerTwo(uint8_t magnitude) {
+    uint16_t powerTwo(uint16_t magnitude) {
         return 1 << magnitude;
     }
 
-    int decodeMagnitude(uint16_t code, uint8_t magnitude) {
+    int decodeMagnitude(uint16_t code, uint16_t magnitude) {
         int res;
         if (code >= powerTwo(magnitude - 1)) {
             res = code;
@@ -162,7 +162,7 @@
         return res;
     }
 
-    bool JPEG::readBlock(const int indexDC, const int indexAC, const int& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
+    bool JPEG::readBlock(const int indexDC, const int indexAC, const int16_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
         Block res;
         if (!bitReader.hasNextBit()) {
             std::cerr << "BR NO MORE" << std::endl;
@@ -236,14 +236,14 @@
 
 
 
-        int previousDC[3] = {0};
+        int16_t previousDC[3] = {0};
         int count = 0;
         for (int i = 0; i < mcuWidth * mcuHeight; i++) {
             for (int j = 0; j < nb_comp; j++) {
                 for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
                     bool loop = readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br, blocks);
                     if (loop) {
-                        previousDC[j] = blocks[blocks.size() - 1].values[0];
+                        previousDC[j] = (int16_t) blocks[blocks.size() - 1].values[0];
                         blocks[blocks.size() - 1].blockNumber = count;
                         count++;
                         blocks[blocks.size() - 1].composante = j;
@@ -265,7 +265,7 @@
         return blocks;
     }
 
-    double JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
+    int JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
         double sum = 0;
         double Clambda = 0;
         double Cmu = 0;
@@ -296,7 +296,7 @@
         std::vector<Block> spatialBlocks;
         https://github.com/dannye/jed.git
         for (int i = 0; i < frequentialBlocks.size(); i++) {
-            std::vector<double> values;
+            std::vector<int> values;
             Block test = frequentialBlocks[i];
             for (int x = 0; x < 8; x++) {
 
