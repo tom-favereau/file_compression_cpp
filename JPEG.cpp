@@ -60,13 +60,15 @@
             int marker = ByteReading::readBytes(sector, 0, 2);
             if (marker == 0xffe0) {
                 //APP0
+                std::cout << "APP0 DETECTED" << std::endl;
                 //TODO Check if image is in JFIF
             } else if (marker == 0xffdd) {
                 //TODO DRI NOT YET SUPPORTED
-                std::cerr << "DRI NOT YET SUPPORTED" << std::endl;
+                std::cout << "DRI NOT YET SUPPORTED" << std::endl;
             } else if (marker > 0xffe0 && marker <= 0xffef) {
                 //TODO APPn exception not handled
                 std::cerr << "APPn not handled" << std::endl;
+                std::cerr << (int) marker << std::endl;
             } else if (marker == 0xffdb) {
                 //DQT
                 quantisationTables.push_back(QuantisationTable(sector));
@@ -162,8 +164,10 @@
         return res;
     }
 
-    bool JPEG::readBlock(const int indexDC, const int indexAC, const int16_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
+    bool JPEG::readBlock(const int indexDC, const int indexAC, const int64_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
         Block res;
+
+        //std::cout << "previousDC" << previousDC << std::endl;
         if (!bitReader.hasNextBit()) {
             std::cerr << "BR NO MORE" << std::endl;
             return false;
@@ -294,7 +298,6 @@
     std::vector<Block> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
 
         std::vector<Block> spatialBlocks;
-        https://github.com/dannye/jed.git
         for (int i = 0; i < frequentialBlocks.size(); i++) {
             std::vector<int> values;
             Block test = frequentialBlocks[i];
@@ -425,8 +428,16 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         for (int k = 0; k < ycbcr.Y.size(); k++) {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
-                    int x = 8*(k*8 / width) + i;
-                    int y = (k*8 % width) + j;
+                    int remainder = width%8;
+                    int x;
+                    int y;
+                    if (remainder != 0) {
+                        x = 8 * (k * 8 / (width + 8 - remainder)) + i;
+                        y = (k * 8 % (width + 8 - remainder)) + j;
+                    } else {
+                        x = 8 * (k * 8 / width) + i;
+                        y = (k * 8 % width ) + j;
+                    }
                     if (x < height && y < width) {
                         res[x][y].comp1 = ycbcr.Y[k][i][j];
                         //ONLY FOR FRANCOIS

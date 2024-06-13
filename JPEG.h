@@ -87,7 +87,7 @@
     public:
         explicit JPEG(const std::string& file_name);
 
-        bool readBlock(const int indexDC, const int indexAC, const int16_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const;
+        bool readBlock(const int indexDC, const int indexAC, const int64_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const;
 
         //static methods
         static std::vector<char> getBytes(const std::string& filename);
