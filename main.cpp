@@ -5,7 +5,7 @@
 int main() {
     std::string filename_a = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/alexandria.jpeg)";
     //std::string filename_f = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/francois.jpg)";
-    std::string filename_ft = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/francois.jpg)";
+    std::string filename_ft = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/sch.jpeg)";
     std::string filename_c = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/cat.jpg)";
     std::string filename_g = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/goldfish_2to1H.jpg)";
     //std::string filename_t = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/test.jpeg)";
