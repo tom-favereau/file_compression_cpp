@@ -221,6 +221,7 @@
                     magnitude = ByteReading::readByte(byte, 4, 4);
                     code = bitReader.nextNBits(magnitude);
                     res.values.push_back(decodeMagnitude(code, magnitude));
+
                     code = 0;
                 }
             }

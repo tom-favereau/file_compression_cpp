@@ -6,19 +6,20 @@ int main() {
     std::string filename_a = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/alexandria.jpeg)";
     //std::string filename_f = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/francois.jpg)";
     std::string filename_ft = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/sch.jpeg)";
+    std::string filename_fa = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/renee.jpeg)";
     std::string filename_c = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/cat.jpg)";
     std::string filename_g = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/goldfish_2to1H.jpg)";
     //std::string filename_t = R"(C:/Users/alici/S8_Cpp/file_compression_cpp/test.jpeg)";
     std::string filename_p = R"(/Users/tom/Programation/dep_info/cpp/file_compression_cpp/pick.jpeg)";
 
-    auto filestream = JPEG::getBytes(filename_ft);
-    auto sectors = JPEG::getSectors(filestream);
-    int sector_size = 0;
-    for (const auto& sector : sectors) {
-        sector_size += sector.size();
-    }
-    std::cout << "filestream size: " << filestream.size() << std::endl;
-    std::cout << "sector size: " << sector_size << std::endl;
+    //auto filestream = JPEG::getBytes(filename_ft);
+    //auto sectors = JPEG::getSectors(filestream);
+    //int sector_size = 0;
+    //for (const auto& sector : sectors) {
+    //    sector_size += sector.size();
+    //}
+    //std::cout << "filestream size: " << filestream.size() << std::endl;
+    //std::cout << "sector size: " << sector_size << std::endl;
 
     char c = '\010';
     std::cout << "Read Byte: " << ByteReading::readByte(c, 2, 4) << std::endl;
@@ -52,7 +53,7 @@ int main() {
 
 
     std::cout << "pick" << std::endl;
-    JPEG francois = JPEG(filename_ft);
+    JPEG francois = JPEG(filename_fa);
     auto francois_Blocks = francois.readBlocks();
     std::vector<Block> spatialBlock_francois = francois.getSpatialBlocks(francois_Blocks);
     YCbCr YCbCr_francois = JPEG::BlocksToYCbCr(spatialBlock_francois);
