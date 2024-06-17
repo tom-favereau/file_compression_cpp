@@ -1,35 +1,61 @@
 # JPEG Decoder
 
+This project implements a decoder for JPEG JFIF images.
 
-This project implement a decoder for JPEG JFIF
+To get started, open the project with an IDE that supports CMake, and change the image path in the main file.
 
-## Algorithm description
+## Algorithm Description
 
-First we decode the fondamental harmonic with rle, 
-and we decode the end of the signal magnitude.
-Then we apply Huffman (with two diferent table) to
-decode the complete signal.
+First, we decode the fundamental harmonic with RLE (Run-Length Encoding) and decode the end of the signal magnitude. Then, we apply Huffman coding (using two different tables) to decode the complete signal.
 
-As our eyes are more sensible to luminence variation.
-The image is store in format YCbCr and the block Cb and Cr 
-are compressed.
+Since our eyes are more sensitive to luminance variation, the image is stored in the YCbCr format, and the Cb and Cr blocks are compressed.
 
-The format JFIF allow four type of compression :
+The JFIF format allows four types of compression:
 
-- Horizontal compression, stored Y1Y2CbCr
-- Vertical compression, stored Y1Y2CbCr
-- Quadra compression, stored Y1Y2Y3Y4CbCr
-- No compression, stored YCbCr
+Horizontal compression, stored as Y1Y2CbCr
+Vertical compression, stored as Y1Y2CbCr
+Quadra compression, stored as Y1Y2Y3Y4CbCr
+No compression, stored as YCbCr
+After decoding all the signals, we have to upscale the chrominance blocks.
 
-After decode all the signal we have to upscale crominence block.
+## Difficulties
 
-## Dificulty
+### Unused Information
+Some blocks are not used at the end of the file, and we had to account for this.
 
-### Unused information
+### Size
+We have to pay attention to whether the size of the image is a multiple of 8.
 
-Some blocks are not used at the end of the file and we had to take it into acount.
+### Error Propagation
+Because the fundamental frequency is encoded by difference, if we fail to decode one part correctly, we may fail to decode the whole image.
+
+## Example of Images
+
+First decompression: The loop was not well calibrated, causing these grey bands.
+
+![premiére décompression de Francois](illustration/first_francois.png)
 
 
-### 
+Second decompression: The fundamental frequency was not well decoded, causing this.
+
+![premiére décompression de Francois](illustration/francois2.png)
 
 
+Third decompression: We did not find a way to correct this.
+
+![premiére décompression de Francois](illustration/francois4.png)
+
+
+Here, the image's size is not a multiple of 8, causing this shift.
+
+![premiére décompression de Francois](illustration/renee.png)
+
+
+Once it is corrected:
+
+![premiére décompression de Francois](illustration/renee2.png)
+
+
+One last image:
+
+![premiére décompression de Francois](illustration/chappell.png)
