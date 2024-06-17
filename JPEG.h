@@ -15,7 +15,9 @@
 #include "BitReader.h"
 
 
-
+    /**
+     * Stores information from SOF.
+     */
     struct InfoComposante {
         int ic; // indice de composante horizontal
         int fh; // facteur d'échantillonage horizontal
@@ -23,12 +25,19 @@
         int iq; // indice quantification
     };
 
+    /**
+     * Stores information from SOS.
+     */
     struct InfoBrut{
         int ic; //indice composante
         int ihAC; //indice huffman
         int ihDC; //indice huffman
     };
 
+    /**
+     * Represents a 8x8 block of pixels of a jpeg image.
+     * values store the 64 values in zig zag order.
+     */
     struct Block{
         int start = -1;
         int end = -1;
@@ -37,19 +46,27 @@
         int blockNumber = -1;
     };
 
+    /**
+     * Represents a pixel, either in RBG or YCbCr.
+     */
     struct Pixel{
         int comp1;
         int comp2;
         int comp3;
     };
 
+    /**
+     * Used to store all Y, Cb and Cr blocks of a jpeg image.
+     */
     struct YCbCr{
         std::vector<std::vector<std::vector<double>>> Y;
         std::vector<std::vector<std::vector<double>>> Cb;
         std::vector<std::vector<std::vector<double>>> Cr;
     };
 
-
+    /**
+     * Class for JPEG images.
+     */
     class JPEG {
 
     private:
@@ -61,10 +78,10 @@
         uint8_t nb_comp; //couleur ou non
         std::vector<InfoComposante> arrayInfoComposante; //tableau de taille nb_com
 
-        //colorOder
+        //colorOder: blocks of a jpeg image may be given in a different order than the one defined in SOF.
         std::unordered_map<int, int> colorOrder;
 
-        //mcuHeights mcuWidth
+        //mcuHeight, mcuWidth: number of MCUs in height and width.
         int mcuHeight;
         int mcuWidth;
 

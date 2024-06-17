@@ -8,7 +8,14 @@
 
 #include <vector>
 #include <cstdint>
-
+/**
+ * Class that allows reading a byte stream bit by bit.
+ * 4 attributes:
+ *  - currentByteIndex (current index in the byte currently read)
+ *  - currentByte (byte which is currently read)
+ *  - sector: byte stream to be read given as a vector of uint8_t
+ *  - currentSectorIndex: index of currently read byte in the sector
+ */
 class BitReader {
 public:
     explicit BitReader(const std::vector<char>& sector);

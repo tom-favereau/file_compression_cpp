@@ -8,6 +8,9 @@
 
 #include <vector>
 
+/**
+ * Facilitation of reading bytes in sector (vector of char) or reading bits within a byte.
+ */
 class ByteReading {
 
 public:

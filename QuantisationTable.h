@@ -7,13 +7,16 @@
 #include <cstdint>
 #include <vector>
 
-
+/**
+ * Class representing quantisation tables.
+ */
     class QuantisationTable {
     private:
+        //Precision 8 or 16 bits.
         bool precision;
 
         uint8_t iq; //indice de la table
-
+        //64 values from an 8x8 matrix, in zig zag order.
         std::vector<char> values;
 
     public:

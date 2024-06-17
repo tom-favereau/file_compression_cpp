@@ -19,6 +19,13 @@ int ByteReading::readBytes(const std::vector<char>& imageBytes, int index, int s
     return res;
 }
 
+/**
+ * Read bits in a byte and converts the result to an int.
+ * @param byte char to read from.
+ * @param index index in the byte at which reading is started.
+ * @param size number of bits to be read.
+ * @return the int represented by the bits starting at index index of size size.
+ */
 int ByteReading::readByte(char byte, int index, int size){
     char mask = ((1 << size) - 1) << (8 - index - size);
     return (byte & mask) >> (8 - index - size);

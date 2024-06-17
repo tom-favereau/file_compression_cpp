@@ -54,8 +54,16 @@
         return sectors;
     }
 
+    /**
+     * Constructs a JPEG instance from a JPEG image.
+     * Currently, only JFIF images with no restart intervals nor subsampling are handled. Images
+     * which use a single DHT or DQT section to define multiple huffman table or quantisation tables are
+     * not handled either.
+     * @param file_name in string.
+     */
     JPEG::JPEG(const std::string& file_name) : file_name(file_name) {
         std::vector<std::vector<char>> sectors = getSectors(getBytes(file_name));
+        //Identifying sectors
         for (const auto& sector : sectors) {
             int marker = ByteReading::readBytes(sector, 0, 2);
             if (marker == 0xffe0) {
@@ -125,6 +133,7 @@
         mcuHeight = (height + 7) / 8;
         mcuWidth = (width + 7) / 8;
 
+        //UNUSED LINES BECAUSE SUBSAMPLING IS NOT HANDLED
         if (mcuHeight % 2 && arrayInfoComposante[0].fv == 2) {
             mcuHeight++;
         }
@@ -135,8 +144,7 @@
         }
 
 
-
-
+        //Initialization of colorOrder
         for (int i = 0; i < nb_comp; i++) {
             int indexInSOS;
             for (int j = 0; j < nb_comp; j++){
@@ -148,6 +156,11 @@
         }
     }
 
+    /**
+     * Adds N zeroes to the values of a block.
+     * @param block in which N zeroes will be added.
+     * @param N int, number of zeroes to add.
+     */
     void addNZeroes(Block& block, int N) {
         for (int i = 0; i < N; i++){
 
@@ -156,43 +169,76 @@
         }
     }
 
+    /**
+     * Fills up the remaining space of a block with zeroes (up to 64 because a block is 8x8).
+     * @param block to fill with zeroes.
+     */
     void fillZeroes(Block& block) {
         while (block.values.size() < 64) {
             block.values.push_back(0);
         }
     }
 
+    /**
+     * Calculates 2 to the power magnitude.
+     * @param magnitude int, power.
+     * @return 2^magnitude as an uint16_t.
+     */
     uint16_t powerTwo(uint16_t magnitude) {
         return 1 << magnitude;
     }
 
+    /**
+     * Decodes a encoded value by entropy encoding.
+     * @param code code to be decoded, uint16_t.
+     * @param magnitude magnitude (size of code) in uint16_t (at most eleven).
+     * @return the value of the entropy code.
+     */
     int decodeMagnitude(uint16_t code, uint16_t magnitude) {
         int res;
+        //If the code starts by one, i.e. if code >= 2^(magnitude - 1), the code is the value
         if (code >= powerTwo(magnitude - 1)) {
             res = code;
         } else {
+            //Otherwise the value is code - 2^magnitude + 1
+            //Inverting 0 to 1 and vice versa also works.
             res = code - (powerTwo(magnitude) - 1);
         }
         return res;
     }
 
+    /**
+     * Reads the next block from the huffman encoded byte stream.
+     * @param indexDC Index of the DC Huffman table to be used.
+     * @param indexAC Index of the AC Huffman table to be used.
+     * @param previousDC Value of previous DC for a given color.
+     * @param bitReader Reference to a bit reader reading the huffman encoded byte stream.
+     * @param blocks reference to a vector of blocks where the results of block reading are stored.
+     * @return true if a block was successfully read, false otherwise.
+     */
     bool JPEG::readBlock(const int indexDC, const int indexAC, const int64_t& previousDC, BitReader& bitReader, std::vector<Block>& blocks) const {
         Block res;
 
         //std::cout << "previousDC" << previousDC << std::endl;
+        //Shouldn't happen
         if (!bitReader.hasNextBit()) {
             std::cerr << "BR NO MORE" << std::endl;
             return false;
         }
+        //Load huffman tables
         const auto& huffmanDC = DCHuffmanTables[indexDC];
         const auto& huffmanAC =  ACHuffmanTables[indexAC];
 
-
+        //Code reading is done with code
         uint16_t code = 0;
+        //Stores magnitude
         int magnitude;
+        //Stores size of the code.
         int size = 0;
 
         //-----------------DC---------------
+        //DC values are stored first. They are encoded differentially, previous DC values are thus needed.
+        //DC values are decoded by first decoding the magnitude of the differential DC value.....
         while (bitReader.hasNextBit()){
             code <<= 1;
             code += bitReader.nextBit();
@@ -205,11 +251,17 @@
         }
 
         //DC Value reading (code = 0)
+        //........then, by reading the entropy encoded differential DC value.
         code = bitReader.nextNBits(magnitude);
         res.values.push_back(decodeMagnitude(code, magnitude) + previousDC);
         code = 0;
 
         //-------------------AC----------------------
+        //Next, there are AC 63 values.
+        //162 bytes are encoded in an AC huffman table:
+        //Normal bytes: 4 bits for number of zero values (thus up to 15) between previous and current non-zero values
+        //4 bits for current AC value
+        //Two special bytes: skip more than 16 zeroes (0xF0) and end of block (0x00) (all remaining values are 0).
         while(res.values.size() < 64 && bitReader.hasNextBit()) {
             code <<= 1;
             code += bitReader.nextBit();
@@ -236,6 +288,7 @@
                 }
             }
         }
+        //For debugging purposes
         if (res.values.size() != 64) {
             std::cerr << "BLOCK IS " << res.values.size() << " LONG" << std::endl;
             std::cerr << "Current Sector index: " << bitReader.getCurrentSectorIndex() << std::endl;
@@ -247,17 +300,27 @@
         return true;
     }
 
+    /**
+     * Read all the blocks from the huffman encoded data of this JPEG image.
+     * @return a vector of all the blocks encoded in this JPEG image.
+     */
     std::vector<Block> JPEG::readBlocks() {
+        //Initialization of bit reading.
         BitReader br = BitReader(rawData);
         std::vector<Block> blocks;
 
 
-
+        //DC values are initialized for all colors to 0.
         int16_t previousDC[3] = {0};
+        //Total number of blocks
         int count = 0;
+        //Iteration over the number of MCUs
         for (int i = 0; i < mcuWidth * mcuHeight; i++) {
+            //Iteration over the number of component (grayscale: 1, color: 3 (YCbCr))
             for (int j = 0; j < nb_comp; j++) {
+                //Iteration over the number of Blocks require to form a full MCU if Cb and Cr are subsampling.
                 for (int k = 0; k < arrayInfoComposante[colorOrder[j]].fh * arrayInfoComposante[colorOrder[j]].fv; k++) {
+                    //Loop bool for debugging purposes and ensure a block is safely read.
                     bool loop = readBlock(arrayInfoBrut[j].ihDC, arrayInfoBrut[j].ihAC, previousDC[j], br, blocks);
                     if (loop) {
                         previousDC[j] = (int16_t) blocks[blocks.size() - 1].values[0];
@@ -276,12 +339,21 @@
             }
         }
         //std::vector<Block> last10Blocks = {blocks.end() - 10, blocks.end()};
+        //Debugging purposes: image that are not correctly decompressed usually have remaining information.
         std::cout << "Last Byte Read: " << br.getCurrentByte() << " is byte " << br.getCurrentSectorIndex() << " out of " << br.getSectorSize() - 1 << std::endl;
         std::cout << "Last Byte index " << br.getCurrentByteIndex() << std::endl;
         std::cout << blocks.size() << " blocks." << std::endl;
         return blocks;
     }
 
+    /**
+     * Applies Inverse Quantization and Inverse Cosinus Transform to a spatial pixel.
+     * @param x Abscissa of the spatial pixel in the 8x8 spatial block.
+     * @param y Ordinate of the spatial pixel in the 8x8 spatial block.
+     * @param quantisationTableIndex index of the quantisation table to be used for the frequential block.
+     * @param frequentialBlock frequential block with 64 frequential values store in zig zag order.
+     * @return the computed value at (x,y) in the spatial block.
+     */
     int JPEG::InverseQuantisationCosinusTransform(int x, int y, int quantisationTableIndex, Block frequentialBlock){
         double sum = 0;
         double Clambda = 0;
@@ -308,6 +380,11 @@
         return (1.0/4.0 * sum);
     }
 
+    /**
+     * Converts frequential blocks to spatial blocks.
+     * @param frequentialBlocks blocks to be transformed.
+     * @return vector of spatial blocks obtained by transformation.
+     */
     std::vector<Block> JPEG::getSpatialBlocks(std::vector<Block> frequentialBlocks){
 
         std::vector<Block> spatialBlocks;
@@ -315,7 +392,6 @@
             std::vector<int> values;
             Block test = frequentialBlocks[i];
             for (int x = 0; x < 8; x++) {
-
                 for (int y = 0; y < 8; y++) {
                     values.push_back(InverseQuantisationCosinusTransform(x, y,
                                                                          arrayInfoComposante[frequentialBlocks[i].composante].iq,
@@ -329,6 +405,7 @@
         return spatialBlocks;
     }
 
+    //UNFINISHED
     std::vector<Block> JPEG::upscaledBlock(const Block& blockToUpscale) {
         std::vector<Block> res;
         //only supports JFIF
@@ -340,10 +417,11 @@
         return res;
     }
 
+    //UNFINISHED
     YCbCr JPEG::upscaleByComponent(std::vector<std::vector<std::vector<double>>> spatialBlocks){
     }
 
-
+//UNFINISHED
 std::vector<std::vector<Pixel>> JPEG::upscale(std::vector<std::vector<std::vector<double>>> spatialBlocks) {
     std::vector<std::vector<Pixel>> imageYCC;
     for (int i = 0; i < height; i++){
@@ -367,6 +445,12 @@ std::vector<std::vector<Pixel>> JPEG::upscale(std::vector<std::vector<std::vecto
     return imageYCC;
 }
 
+/**
+ * Converts a YCbCr pixel to a RGB pixel
+ * @param pixel YCbCr pixel with values obtained from the inverse quantisation and cosinus transform.
+ * Y values range from -128 to 127.
+ * @return the pixel in RGB color coordinates.
+ */
 Pixel YCbCrToRGB(Pixel pixel) {
         Pixel res{};
 
@@ -389,6 +473,11 @@ Pixel YCbCrToRGB(Pixel pixel) {
         return res;
     }
 
+    /**
+     * Converts YCbCr pixels of a JPEG image to RGB pixels.
+     * @param pixels YCbCr pixels of a JPEG image given as an vector of vector of pixels.
+     * @return pixels of the JPEG image in RGB color coordinates as an vector of vector of pixels.
+     */
 std::vector<std::vector<Pixel>> JPEG::YCbCrToRGBPixels(const std::vector<std::vector<Pixel>>& pixels) {
         std::vector<std::vector<Pixel>> res;
         for (int i = 0; i < pixels.size(); i++) {
@@ -404,6 +493,11 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToRGBPixels(const std::vector<std::ve
         return res;
     }
 
+    /**
+     * Converts a vector of blocks to a YCbCr structure.
+     * @param blocks Blocks to be converted to YCbCr
+     * @return vectors of Y, Cb, Cr component store in a YCbCr structure.
+     */
 YCbCr JPEG::BlocksToYCbCr(std::vector<Block> blocks) {
         YCbCr ycbcr;
         for (auto & block : blocks) {
@@ -414,6 +508,7 @@ YCbCr JPEG::BlocksToYCbCr(std::vector<Block> blocks) {
                     doubleBlock[x].push_back(block.values[x*8+y]);
                 }
             }
+            //Here colorOrder was ignored, it works most of the times.
             if (block.composante == 0) {
                 ycbcr.Y.push_back(doubleBlock);
             } else if (block.composante == 1) {
@@ -427,6 +522,12 @@ YCbCr JPEG::BlocksToYCbCr(std::vector<Block> blocks) {
         return ycbcr;
     }
 
+    /**
+     * Converts the 8x8 Blocks of Y, Cb, Cr components of this image to height * width vector of vector of pixels.
+     * @param ycbcr YCbCr structure containing all 8x8 blocks of this image.
+     * @return a vector of vector of pixels in YCbCr of dimensions height*width.
+     * DOES NOT SUPPORT UPSCALING YET
+     */
 std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         //SANS UPSCALE
         std::vector<std::vector<Pixel>> res;
@@ -453,9 +554,6 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
                     }
                     if (x < height && y < width) {
                         res[x][y].comp1 = ycbcr.Y[k][i][j];
-                        //ONLY FOR FRANCOIS
-                        //TODO SUPPORT UPSCALING
-
                         res[x][y].comp2 = ycbcr.Cb[k][i][j];
                         res[x][y].comp3 = ycbcr.Cr[k][i][j];
 
@@ -466,7 +564,11 @@ std::vector<std::vector<Pixel>> JPEG::YCbCrToPixels(YCbCr ycbcr) const {
         return res;
     }
 
-
+/**
+ * Writes pixels to a file used with display.py.
+ * @param pixels vector of vector of the pixels of a JPEG image.
+ * @param filename name of file to write in.
+ */
 void JPEG::writePixelsToFile(const std::vector<std::vector<Pixel>>& pixels, const std::string& filename) {
     std::ofstream file(filename);
     if (!file) {
